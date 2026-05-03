@@ -133,5 +133,5 @@ SECRET_KEY = os.environ.get('hhdHSA*h78dhSA&*dhdasdhja', 'django-insecure-$^rx6_
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 import os
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-$^rx6_jml%-^optj+6n*h$kv58x27fhcr8=ixapmdc7ndb+6@k')
+SECRET_KEY = os.environ.get('dsadDHH&D3hd3hd8#H*', 'django-insecure-$^rx6_jml%-^optj+6n*h$kv58x27fhcr8=ixapmdc7ndb+6@k')
 STATIC_ROOT = BASE_DIR / 'staticfiles'
