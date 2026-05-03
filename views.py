@@ -27,3 +27,7 @@ def login_view(request):
         return Response({'token': token.key})
     
     return Response({'error': 'Неверные данные'}, status=400)
+
+from django.http import HttpResponse
+def home(request):
+    return HttpResponse("OK")
