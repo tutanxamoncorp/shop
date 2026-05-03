@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-$^rx6_jml%-^optj+6n*h$kv58x27fhcr8=ixapmdc7ndb+6@k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['shop-nxsb.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['shop-n3qe.onrender.com', '*']
 
 
 # Application definition
@@ -130,4 +130,8 @@ REST_FRAMEWORK = {
 
 import os
 SECRET_KEY = os.environ.get('hhdHSA*h78dhSA&*dhdasdhja', 'django-insecure-$^rx6_jml%-^optj+6n*h$kv58x27fhcr8=ixapmdc7ndb+6@k')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+import os
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-$^rx6_jml%-^optj+6n*h$kv58x27fhcr8=ixapmdc7ndb+6@k')
 STATIC_ROOT = BASE_DIR / 'staticfiles'
