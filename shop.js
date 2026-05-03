@@ -66,7 +66,7 @@ function renderCatalog(list) {
                     "</div>" +
                 "</div>" +
             "</div>"
-        );
+        ); 
     }).join("");
 }
 

@@ -58,12 +58,3 @@ a {
     color: #4CAF50;
     text-decoration: none;
 }
-@media (max-width: 480px) {
-    .form-box {
-        padding: 25px; 
-    }
-    
-    h2 {
-        font-size: 1.5rem;
-    }
-}
