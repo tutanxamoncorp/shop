@@ -57,6 +57,7 @@ p {
 a {
     color: #4CAF50;
     text-decoration: none;
+<<<<<<< HEAD
 }
 @media (max-width: 480px) {
     .form-box {
@@ -66,4 +67,6 @@ a {
     h2 {
         font-size: 1.5rem;
     }
+=======
+>>>>>>> e401268 (first commit)
 }
