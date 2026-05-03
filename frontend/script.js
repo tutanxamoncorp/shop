@@ -1,4 +1,4 @@
-const API = "https://shop-n3qe.onrender.com";
+const API = "https://shop-nxsb.onrender.com";
 
 
 (function () {
