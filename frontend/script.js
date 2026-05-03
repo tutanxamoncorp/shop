@@ -1,19 +1,24 @@
-const path = window.location.pathname;
-const token = localStorage.getItem("token");
+const API = "https://shop-n3qe.onrender.com";
 
-if (path.includes("index.html") || path.endsWith("/") || path.endsWith("/shop")) {
-    if (!token) {
+
+(function () {
+    const path = window.location.pathname;
+    const token = localStorage.getItem("token");
+
+    const isShopPage =
+        path.includes("shop.html") ||
+        path.includes("index.html") ||
+        path.endsWith("/") ||
+        path.endsWith("/shop");
+
+    if (isShopPage && !token) {
         window.location.href = "login.html";
-    } else {
-        const username = localStorage.getItem("username");
-        document.getElementById("welcome").textContent = `Привет, ${username}! 👋`;
     }
-}
+})();
 
-const API = "https://shop-n3qe.onrender.com"; // сюда Railway ссылку
 
 async function register() {
-    const username = document.getElementById("username").value;
+    const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
     if (!username || !password) {
@@ -28,8 +33,10 @@ async function register() {
     });
 
     if (res.ok) {
-        alert("Аккаунт создан! Теперь войди.");
-        window.location.href = "login.html";
+        const data = await res.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", username);
+        window.location.href = "shop.html";
     } else {
         const data = await res.json();
         alert("Ошибка: " + JSON.stringify(data));
@@ -37,7 +44,7 @@ async function register() {
 }
 
 async function login() {
-    const username = document.getElementById("username").value;
+    const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
     const res = await fetch(`${API}/api/login/`, {
@@ -50,24 +57,15 @@ async function login() {
         const data = await res.json();
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", username);
-        window.location.href = "index.html";
+        window.location.href = "shop.html";
     } else {
         alert("Неверный логин или пароль!");
     }
 }
 
+
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     window.location.href = "login.html";
-}
-
-if (window.location.pathname.includes("index.html")) {
-    const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
-    if (!token) {
-        window.location.href = "login.html";
-    } else {
-        document.getElementById("welcome").textContent = `Привет, ${username}! 👋`;
-    }
 }
