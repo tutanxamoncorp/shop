@@ -17,7 +17,7 @@ function showLoader() {
     loader.style.display = 'flex';
     window.loaderTimer = setTimeout(() => {
         if (waitMsg) waitMsg.style.display = 'block';
-    }, 2000);
+    }, 4000);
 }
 
 function hideLoader() {
