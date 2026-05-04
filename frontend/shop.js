@@ -1,4 +1,3 @@
-
 const products = [
     { id:1,  brand:"Nike",        name:'Air Force 1 "Triple White"',     emoji:"👟", price:4200,  badge:"new",  category:"nike" },
     { id:2,  brand:"Jordan",      name:"Air Jordan 1 Retro High OG",     emoji:"🏀", price:8500,  badge:null,   category:"jordan" },
@@ -30,10 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("cart-overlay").classList.add("open");
         });
     }
-
     renderCatalog(products);
 });
-
 
 function renderCatalog(list) {
     const grid = document.getElementById("catalog");
@@ -42,82 +39,62 @@ function renderCatalog(list) {
     if (countLabel) countLabel.textContent = list.length + " товаров";
 
     grid.innerHTML = list.map(function (p) {
-        const badge = p.badge
-            ? '<div class="product-badge ' + p.badge + '">' + (p.badge === "new" ? "NEW" : "SALE") + "</div>"
-            : "";
-        const oldPrice = p.oldPrice
-            ? '<span class="product-price-old">$' + p.oldPrice.toLocaleString() + "</span>"
-            : "";
-            
+        const badge = p.badge ? `<div class="product-badge ${p.badge}">${p.badge === "new" ? "NEW" : "SALE"}</div>` : "";
+        const oldPrice = p.oldPrice ? `<span class="product-price-old">$${p.oldPrice.toLocaleString()}</span>` : "";
+        const cartItem = cart.find(x => x.id === p.id);
 
-        const inCart = cart.find(function (x) { return x.id === p.id; });
-        const btnClass = inCart ? "add-btn added" : "add-btn";
-        const btnText = inCart ? "✓" : "+";
+        let actionHTML = cartItem 
+            ? `<div class="qty-control">
+                <button class="qty-btn" onclick="updateQty(${p.id}, -1)">−</button>
+                <span class="qty-value">${cartItem.qty}</span>
+                <button class="qty-btn" onclick="updateQty(${p.id}, 1)">+</button>
+               </div>`
+            : `<button class="add-btn" onclick="addToCart(${p.id})">+</button>`;
 
-        return (
-            '<div class="product-card">' +
-                '<div class="product-img">' +
-                    badge +
-                    "<span>" + p.emoji + "</span>" +
-                "</div>" +
-                '<div class="product-info">' +
-                    '<div class="product-brand">' + p.brand + "</div>" +
-                    '<div class="product-name">' + p.name + "</div>" +
-                    '<div class="product-footer">' +
-                        "<div>" +
-                            '<span class="product-price">$' + p.price.toLocaleString() + "</span>" +
-                            oldPrice +
-                        "</div>" +
-                      
-                        '<button class="' + btnClass + '" id="btn-' + p.id + '" onclick="addToCart(' + p.id + ')">' + btnText + '</button>' +
-                    "</div>" +
-                "</div>" +
-            "</div>"
-        );
+        return `<div class="product-card">
+            <div class="product-img">${badge}<span>${p.emoji}</span></div>
+            <div class="product-info">
+                <div class="product-brand">${p.brand}</div>
+                <div class="product-name">${p.name}</div>
+                <div class="product-footer">
+                    <div><span class="product-price">$${p.price.toLocaleString()}</span>${oldPrice}</div>
+                    ${actionHTML}
+                </div>
+            </div>
+        </div>`;
     }).join("");
 }
-function filterProducts(cat, btn) {
-    document.querySelectorAll(".filter-btn").forEach(function (b) { b.classList.remove("active"); });
-    btn.classList.add("active");
-    activeCategory = cat;
-    filtered = cat === "all" ? [...products] : products.filter(function (p) { return p.category === cat; });
-    renderCatalog(filtered);
-}
-
-function sortProducts(val) {
-    if (val === "price_asc") filtered.sort(function (a, b) { return a.price - b.price; });
-    else if (val === "price_desc") filtered.sort(function (a, b) { return b.price - a.price; });
-    else if (val === "name") filtered.sort(function (a, b) { return a.name.localeCompare(b.name); });
-    else filtered = activeCategory === "all" ? [...products] : products.filter(function (p) { return p.category === activeCategory; });
-    renderCatalog(filtered);
-}
-
 
 function addToCart(id) {
-    const p = products.find(function (x) { return x.id === id; });
-    const existing = cart.find(function (x) { return x.id === id; });
+    const p = products.find(x => x.id === id);
+    const existing = cart.find(x => x.id === id);
     if (existing) { existing.qty++; } else { cart.push(Object.assign({}, p, { qty: 1 })); }
     updateCartCount();
     showToast(p.name + " добавлен в корзину");
-    const btn = document.getElementById("btn-" + id);
-    if (btn) { btn.classList.add("added"); btn.textContent = "✓"; }
+    renderCartItems(); 
+    renderCatalog(filtered); 
+}
+
+function updateQty(id, delta) {
+    const itemIndex = cart.findIndex(x => x.id === id);
+    if (itemIndex > -1) {
+        cart[itemIndex].qty += delta;
+        if (cart[itemIndex].qty <= 0) cart.splice(itemIndex, 1);
+    }
+    updateCartCount();
+    renderCartItems();
+    renderCatalog(filtered);
 }
 
 function removeFromCart(id) {
-
-    cart = cart.filter(function (x) { return x.id !== id; });
+    cart = cart.filter(x => x.id !== id);
     updateCartCount();
     renderCartItems();
-
-   
-    const btn = document.getElementById("btn-" + id);
-    if (btn) { 
-        btn.classList.remove("added"); 
-        btn.textContent = "+"; 
-    }
+    renderCatalog(filtered);
 }
+
 function updateCartCount() {
-    const total = cart.reduce(function (s, x) { return s + x.qty; }, 0);
+    const total = cart.reduce((s, x) => s + x.qty, 0);
     const el = document.getElementById("cart-count");
     if (!el) return;
     el.style.display = total > 0 ? "flex" : "none";
@@ -135,23 +112,41 @@ function renderCartItems() {
         return;
     }
 
-    container.innerHTML = cart.map(function (item) {
-        return (
-            '<div class="cart-item">' +
-                '<div class="cart-item-img">' + item.emoji + "</div>" +
-                '<div class="cart-item-info">' +
-                    '<div class="cart-item-name">' + item.name + "</div>" +
-                    '<div class="cart-item-price">' + item.qty + " × $" + item.price.toLocaleString() + "</div>" +
-                "</div>" +
-                '<button class="cart-item-remove" onclick="removeFromCart(' + item.id + ')">✕</button>' +
-            "</div>"
-        );
-    }).join("");
+    container.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <div class="cart-item-img">${item.emoji}</div>
+            <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">$${(item.price * item.qty).toLocaleString()}</div>
+            </div>
+            <div class="qty-control cart-qty">
+                <button class="qty-btn" onclick="updateQty(${item.id}, -1)">−</button>
+                <span class="qty-value">${item.qty}</span>
+                <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+            </div>
+            <button class="cart-item-remove" onclick="removeFromCart(${item.id})">✕</button>
+        </div>`).join("");
 
-    const sum = cart.reduce(function (s, x) { return s + x.price * x.qty; }, 0);
+    const sum = cart.reduce((s, x) => s + (x.price * x.qty), 0);
     const totalEl = document.getElementById("cart-total");
     if (totalEl) totalEl.textContent = "$" + sum.toLocaleString();
     if (footer) footer.style.display = "block";
+}
+
+function filterProducts(cat, btn) {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeCategory = cat;
+    filtered = cat === "all" ? [...products] : products.filter(p => p.category === cat);
+    renderCatalog(filtered);
+}
+
+function sortProducts(val) {
+    if (val === "price_asc") filtered.sort((a, b) => a.price - b.price);
+    else if (val === "price_desc") filtered.sort((a, b) => b.price - a.price);
+    else if (val === "name") filtered.sort((a, b) => a.name.localeCompare(b.name));
+    else filtered = activeCategory === "all" ? [...products] : products.filter(p => p.category === activeCategory);
+    renderCatalog(filtered);
 }
 
 function closeCart() {
@@ -168,7 +163,6 @@ function checkout() {
     closeCart();
 }
 
-
 let toastTimer;
 function showToast(msg) {
     const el = document.getElementById("toast");
@@ -176,5 +170,5 @@ function showToast(msg) {
     el.textContent = msg;
     el.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2500);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 2500);
 }

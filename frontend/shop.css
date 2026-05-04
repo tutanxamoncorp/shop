@@ -607,3 +607,62 @@ nav {
     .filters { padding-left: 16px; padding-right: 16px; }
     .catalog-section { padding-left: 16px; padding-right: 16px; }
 }
+/* Контроллер количества в карточке товара */
+.qty-control {
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 30px;
+    height: 36px;
+    overflow: hidden;
+    transition: border-color .2s;
+}
+
+.qty-control:hover {
+    border-color: var(--accent);
+}
+
+.qty-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    width: 32px;
+    height: 100%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, color .2s;
+}
+
+.qty-btn:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+.qty-value {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    width: 24px;
+    text-align: center;
+    color: var(--text);
+    user-select: none;
+}
+
+
+.cart-qty {
+    height: 28px;
+    margin-right: 12px;
+    margin-left: auto; 
+}
+.cart-qty .qty-btn {
+    width: 24px;
+    font-size: 14px;
+}
+.cart-qty .qty-value {
+    width: 20px;
+    font-size: 13px;
+}
