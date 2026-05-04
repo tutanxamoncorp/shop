@@ -10,13 +10,18 @@
     <div style="position:fixed;top:28px;left:50%;transform:translateX(-50%);font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:5px;color:#f0ede8;">
     SOLE
 </div>
-    <div class="form-box">
-        <h2>Регистрация</h2>
-        <input type="text" id="username" placeholder="Логин">
-        <input type="password" id="password" placeholder="Пароль">
-        <button onclick="register()">Зарегистрироваться</button>
-        <p>Уже есть аккаунт? <a href="login.html">Войти</a></p>
+   <div class="form-box" style="position: relative;">
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <div id="wait-msg" class="loader-wait">PLEASE WAIT...</div>
     </div>
+
+    <h2>Регистрация</h2>
+    <input type="text" id="username" placeholder="Логин">
+    <input type="password" id="password" placeholder="Пароль">
+    <button onclick="handleAuth('register')">Зарегистрироваться</button> 
+    <p>Уже есть аккаунт? <a href="login.html">Войти</a></p>
+</div>
     <script src="script.js"></script>
 </body>
 </html>

@@ -48,6 +48,12 @@ function renderCatalog(list) {
         const oldPrice = p.oldPrice
             ? '<span class="product-price-old">$' + p.oldPrice.toLocaleString() + "</span>"
             : "";
+            
+
+        const inCart = cart.find(function (x) { return x.id === p.id; });
+        const btnClass = inCart ? "add-btn added" : "add-btn";
+        const btnText = inCart ? "✓" : "+";
+
         return (
             '<div class="product-card">' +
                 '<div class="product-img">' +
@@ -62,14 +68,14 @@ function renderCatalog(list) {
                             '<span class="product-price">$' + p.price.toLocaleString() + "</span>" +
                             oldPrice +
                         "</div>" +
-                        '<button class="add-btn" id="btn-' + p.id + '" onclick="addToCart(' + p.id + ')">+</button>' +
+                      
+                        '<button class="' + btnClass + '" id="btn-' + p.id + '" onclick="addToCart(' + p.id + ')">' + btnText + '</button>' +
                     "</div>" +
                 "</div>" +
             "</div>"
         );
     }).join("");
 }
-
 function filterProducts(cat, btn) {
     document.querySelectorAll(".filter-btn").forEach(function (b) { b.classList.remove("active"); });
     btn.classList.add("active");
@@ -98,11 +104,18 @@ function addToCart(id) {
 }
 
 function removeFromCart(id) {
+
     cart = cart.filter(function (x) { return x.id !== id; });
     updateCartCount();
     renderCartItems();
-}
 
+   
+    const btn = document.getElementById("btn-" + id);
+    if (btn) { 
+        btn.classList.remove("added"); 
+        btn.textContent = "+"; 
+    }
+}
 function updateCartCount() {
     const total = cart.reduce(function (s, x) { return s + x.qty; }, 0);
     const el = document.getElementById("cart-count");
