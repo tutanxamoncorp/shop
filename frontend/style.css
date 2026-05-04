@@ -207,3 +207,6 @@ a:hover {
     50% { opacity: 1; }
     100% { opacity: 0.5; }
 }
+* {
+    touch-action: manipulation;
+}

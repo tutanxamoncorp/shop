@@ -666,3 +666,6 @@ nav {
     width: 20px;
     font-size: 13px;
 }
+* {
+    touch-action: manipulation;
+}
