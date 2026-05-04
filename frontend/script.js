@@ -17,7 +17,7 @@ function showLoader() {
     loader.style.display = 'flex';
     window.loaderTimer = setTimeout(() => {
         if (waitMsg) waitMsg.style.display = 'block';
-    }, 4000);
+    }, 2000);
 }
 
 function hideLoader() {
@@ -89,3 +89,9 @@ function logout() {
     localStorage.removeItem("username");
     window.location.href = "login.html";
 }
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        const btn = document.querySelector(".form-box button");
+        if (btn) btn.click();
+    }
+});
