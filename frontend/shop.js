@@ -31,7 +31,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     updateCartCount();
     renderCatalog(products);
+    updateCartCount();
+    renderCartItems(); 
+    renderCatalog(products);
 });
+
 
 function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
