@@ -14,7 +14,7 @@ const products = [
 ];
 
 let filtered = [...products];
-let cart = [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let activeCategory = "all";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -29,8 +29,13 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("cart-overlay").classList.add("open");
         });
     }
+    updateCartCount();
     renderCatalog(products);
 });
+
+function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
 
 function renderCatalog(list) {
     const grid = document.getElementById("catalog");
@@ -68,7 +73,12 @@ function renderCatalog(list) {
 function addToCart(id) {
     const p = products.find(x => x.id === id);
     const existing = cart.find(x => x.id === id);
-    if (existing) { existing.qty++; } else { cart.push(Object.assign({}, p, { qty: 1 })); }
+    if (existing) { 
+        existing.qty++; 
+    } else { 
+        cart.push(Object.assign({}, p, { qty: 1 })); 
+    }
+    saveCart();
     updateCartCount();
     showToast(p.name + " добавлен в корзину");
     renderCartItems(); 
@@ -81,6 +91,7 @@ function updateQty(id, delta) {
         cart[itemIndex].qty += delta;
         if (cart[itemIndex].qty <= 0) cart.splice(itemIndex, 1);
     }
+    saveCart();
     updateCartCount();
     renderCartItems();
     renderCatalog(filtered);
@@ -88,6 +99,7 @@ function updateQty(id, delta) {
 
 function removeFromCart(id) {
     cart = cart.filter(x => x.id !== id);
+    saveCart();
     updateCartCount();
     renderCartItems();
     renderCatalog(filtered);
@@ -175,7 +187,6 @@ function showToast(msg) {
 
 document.addEventListener('touchstart', function (event) {
     if (event.touches.length > 1) {
-      
         event.preventDefault();
     }
 }, { passive: false });
@@ -184,7 +195,6 @@ let lastTouchEnd = 0;
 document.addEventListener('touchend', function (event) {
     const now = (new Date()).getTime();
     if (now - lastTouchEnd <= 300) {
-   
         event.preventDefault();
     }
     lastTouchEnd = now;
