@@ -2,7 +2,6 @@ const API = "https://shop-nxsb.onrender.com";
 
 (function () {
     const path = window.location.pathname;
-    const token = localStorage.getItem("token");
     const isShopPage = path.includes("shop.html") || path.includes("index.html") || path.endsWith("/") || path.endsWith("/shop");
 
     if (isShopPage && !token) {
