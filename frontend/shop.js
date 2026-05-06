@@ -1,4 +1,3 @@
-const API = "https://shop-nxsb.onrender.com";
 const token = localStorage.getItem("token");
 
 const products = [
