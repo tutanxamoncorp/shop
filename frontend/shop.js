@@ -1,3 +1,6 @@
+const API = "https://shop-nxsb.onrender.com";
+const token = localStorage.getItem("token");
+
 const products = [
     { id:1,  brand:"Nike",        name:'Air Force 1 "Triple White"',     emoji:"👟", price:4200,  badge:"new",  category:"nike" },
     { id:2,  brand:"Jordan",      name:"Air Jordan 1 Retro High OG",     emoji:"🏀", price:8500,  badge:null,   category:"jordan" },
@@ -14,8 +17,35 @@ const products = [
 ];
 
 let filtered = [...products];
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart = [];
 let activeCategory = "all";
+
+async function loadCart() {
+    const res = await fetch(`${API}/api/cart/`, {
+        headers: { 'Authorization': `Token ${token}` }
+    });
+    if (res.ok) {
+        const data = await res.json();
+        cart = data.map(item => {
+            const p = products.find(x => x.id === item.product_id);
+            return p ? { ...p, qty: item.qty } : null;
+        }).filter(Boolean);
+        updateCartCount();
+        renderCartItems();
+        renderCatalog(filtered);
+    }
+}
+
+async function saveCartItem(product_id, qty) {
+    await fetch(`${API}/api/cart/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify({ product_id, qty })
+    });
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     const username = localStorage.getItem("username");
@@ -29,17 +59,9 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("cart-overlay").classList.add("open");
         });
     }
-    updateCartCount();
     renderCatalog(products);
-    updateCartCount();
-    renderCartItems(); 
-    renderCatalog(products);
+    loadCart();
 });
-
-
-function saveCart() {
-    localStorage.setItem("cart", JSON.stringify(cart));
-}
 
 function renderCatalog(list) {
     const grid = document.getElementById("catalog");
@@ -52,7 +74,7 @@ function renderCatalog(list) {
         const oldPrice = p.oldPrice ? `<span class="product-price-old">$${p.oldPrice.toLocaleString()}</span>` : "";
         const cartItem = cart.find(x => x.id === p.id);
 
-        let actionHTML = cartItem 
+        let actionHTML = cartItem
             ? `<div class="qty-control">
                 <button class="qty-btn" onclick="updateQty(${p.id}, -1)">−</button>
                 <span class="qty-value">${cartItem.qty}</span>
@@ -74,36 +96,40 @@ function renderCatalog(list) {
     }).join("");
 }
 
-function addToCart(id) {
+async function addToCart(id) {
     const p = products.find(x => x.id === id);
     const existing = cart.find(x => x.id === id);
-    if (existing) { 
-        existing.qty++; 
-    } else { 
-        cart.push(Object.assign({}, p, { qty: 1 })); 
+    if (existing) {
+        existing.qty++;
+        await saveCartItem(id, existing.qty);
+    } else {
+        cart.push({ ...p, qty: 1 });
+        await saveCartItem(id, 1);
     }
-    saveCart();
     updateCartCount();
     showToast(p.name + " добавлен в корзину");
-    renderCartItems(); 
-    renderCatalog(filtered); 
+    renderCartItems();
+    renderCatalog(filtered);
 }
 
-function updateQty(id, delta) {
-    const itemIndex = cart.findIndex(x => x.id === id);
-    if (itemIndex > -1) {
-        cart[itemIndex].qty += delta;
-        if (cart[itemIndex].qty <= 0) cart.splice(itemIndex, 1);
+async function updateQty(id, delta) {
+    const item = cart.find(x => x.id === id);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) {
+        cart = cart.filter(x => x.id !== id);
+        await saveCartItem(id, 0);
+    } else {
+        await saveCartItem(id, item.qty);
     }
-    saveCart();
     updateCartCount();
     renderCartItems();
     renderCatalog(filtered);
 }
 
-function removeFromCart(id) {
+async function removeFromCart(id) {
     cart = cart.filter(x => x.id !== id);
-    saveCart();
+    await saveCartItem(id, 0);
     updateCartCount();
     renderCartItems();
     renderCatalog(filtered);
@@ -166,16 +192,23 @@ function sortProducts(val) {
 }
 
 function closeCart() {
-    const overlay = document.getElementById("cart-overlay");
-    if (overlay) overlay.classList.remove("open");
+    document.getElementById("cart-overlay").classList.remove("open");
 }
 
 function handleOverlayClick(e) {
     if (e.target === document.getElementById("cart-overlay")) closeCart();
 }
 
-function checkout() {
-    showToast("Оформление заказа — скоро! 🚀");
+async function checkout() {
+    await fetch(`${API}/api/cart/clear/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Token ${token}` }
+    });
+    cart = [];
+    updateCartCount();
+    renderCartItems();
+    renderCatalog(filtered);
+    showToast("Заказ оформлен! 🚀");
     closeCart();
 }
 
@@ -188,18 +221,3 @@ function showToast(msg) {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove("show"), 2500);
 }
-
-document.addEventListener('touchstart', function (event) {
-    if (event.touches.length > 1) {
-        event.preventDefault();
-    }
-}, { passive: false });
-
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function (event) {
-    const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-    }
-    lastTouchEnd = now;
-}, false);
